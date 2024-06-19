@@ -2,7 +2,7 @@ import useSWR from 'swr';
 
 export default function usePractice() {
   const { data, error, mutate } = useSWR(
-    '/api/auth/practice',
+    '/api/auth/employer',
     { shouldRetryOnError: false },
   );
 
