@@ -1,0 +1,22 @@
+{
+  "name": "lib",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^6.1.2",
+    "@fortawesome/free-brands-svg-icons": "^6.1.2",
+    "@fortawesome/react-fontawesome": "^0.2.0",
+    "@google-cloud/pubsub": "^3.0.3",
+    "axios": "1.7.2",
+    "date-holidays": "^3.23.12",
+    "handlebars": "^4.7.8",
+    "lodash": "^4.17.21",
+    "mongoose": "^6.13.0",
+    "mongoose-autopopulate": "^0.16.0",
+    "mongoose-lean-virtuals": "^0.9.0",
+    "mysql2": "^3.9.1",
+    "nanoid": "^3.3.4",
+    "redis": "^4.6.13",
+    "resend": "^3.2.0"
+  }
+}

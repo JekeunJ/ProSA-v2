@@ -1,0 +1,10 @@
+{
+  "regions": [
+    "cle1",
+    "iad1",
+    "pdx1"
+  ],
+  "github": {
+    "silent": true
+  }
+}
