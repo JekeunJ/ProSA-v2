@@ -45,7 +45,7 @@ router.delete('/shifts/:id', auth([Employer]), shift.deleteShift);
 router.get('/shifts', auth([Employer, Employee]), shift.listShifts);
 
 // Users
-router.get('/users/:id', auth(), user.retrieveUser);
-router.patch('/users/:id', auth(), user.updateUser);
+router.get('/users', auth(), user.retrieveUser);
+router.patch('/users', auth(), user.updateUser);
 
 module.exports = router;
