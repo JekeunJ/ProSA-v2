@@ -24,7 +24,8 @@ module.exports = withPlugins([
     return [
       {
         source: '/api/:path*',
-        destination: `${process.env.API_BASE_URL}/:path*`,
+        // destination: `${process.env.API_BASE_URL}/:path*`,
+        destination: 'http://localhost:7000/:path*',
       },
     ];
   },
