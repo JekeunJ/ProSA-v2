@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "util": "doppler run -- node"
+    "util": "infisical run -- node"
   },
   "dependencies": {
     "axios": "^1.7.2",

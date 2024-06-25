@@ -1,6 +1,7 @@
 const express = require('express');
 const status = require('http-status');
-const Practice = require('lib/models/Practice');
+const compileTemplate = require('lib/helpers/compileTemplate');
+const Employer = require('lib/models/Employer');
 const Token = require('lib/models/Token');
 const User = require('lib/models/User');
 const resend = require('lib/resend');
@@ -24,14 +25,7 @@ router.post('/login/email', async (req, res, next) => {
       from: 'onboarding@resend.dev',
       to: req.body.email,
       subject: 'Log in to ProSa',
-      html: `
-        <div>
-          Your login link for ProSa
-          <br /><br />
-          <a href="${loginLink}">Continue to ProSa</a>
-          <br /><br />
-        </div>
-      `,
+      html: await compileTemplate('login', { login_link: loginLink }),
     });
 
     res.sendStatus(status.OK);
@@ -63,23 +57,19 @@ router.get('/user', auth(), async (req, res, next) => {
   try {
     res.send({
       user: res.locals.user,
-      client: res.locals.client,
-      practitioner: res.locals.practitioner,
-      practice: res.locals.practice,
+      employee: res.locals.employee,
+      employer: res.locals.employer,
     });
   } catch (err) {
     next(err);
   }
 });
 
-router.get('/practice', auth(), async (req, res, next) => {
+router.get('/employer', auth(), async (req, res, next) => {
   try {
-    // Handle independent practitioners
-    if (res.locals.practitioner && !res.locals.practitioner.practice) return res.send(null);
+    const employer = res.locals.employer || await Employer.findById(res.locals.employee.employer);
 
-    const practice = res.locals.practice || await Practice.findById(res.locals.client?.practice || res.locals.practitioner.practice);
-
-    res.send(practice);
+    res.send(employer);
   } catch (err) {
     next(err);
   }

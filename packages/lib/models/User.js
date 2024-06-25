@@ -25,7 +25,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: null,
     trim: true,
-    validate: (v) => !v || /\d{3}-\d{3}-\d{4}/.test(v),
+    validate: (v) => !v || /^\+\d{10,15}$/.test(v),
   },
 });
 

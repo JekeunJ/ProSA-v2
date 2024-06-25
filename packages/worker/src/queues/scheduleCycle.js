@@ -32,6 +32,7 @@ module.exports = async function scheduleCycle(job) {
       }).join(''),
     }));
 
+    // TODO: Don't copy last cycles shifts, but populate from shift_settings and autofill employees based on last cycle
     // Copy last cycle's shifts
     let shifts = Shift.find({
       employer: employer.id,

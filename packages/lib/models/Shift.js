@@ -1,5 +1,6 @@
 const { nanoid } = require('nanoid');
 const mongoose = require('../mongoose');
+const Employee = require('./Employee');
 const Employer = require('./Employer');
 
 const shiftSchema = new mongoose.Schema({
@@ -46,13 +47,12 @@ const shiftSchema = new mongoose.Schema({
     ref: 'Employer',
     validate: (v) => Employer.exists({ _id: v }),
   },
-  /* TODO: Only allow employee additions if below employer.business.settings.max_per_shift */
+  /* TODO: Only allow employee additions if below employer.settings.max_per_shift */
   employees: [{
     type: String,
     immutable: true,
-    required: true,
-    ref: 'Employer',
-    validate: (v) => Employer.exists({ _id: v }),
+    ref: 'Employee',
+    validate: (v) => Employee.exists({ _id: v }),
   }],
   /* If the shift is canceled, no one can sign up for it */
   /* TODO: This has a number of prerequisites (shift is upcoming) and effects (remove all employees) so only cancelable through DELETE route */
@@ -78,7 +78,7 @@ shiftSchema.virtual('status').get(function () {
 });
 
 shiftSchema.pre('save', async function () {
-  const employer = Employer.findById(this.employer);
+  const employer = await Employer.findById(this.employer);
 
   // Fill in default shift settings
   if (this.min_employees == null)
@@ -86,6 +86,14 @@ shiftSchema.pre('save', async function () {
 
   if (employer.settings.max_employees_per_shift != null && this.max_employees == null)
     this.max_employees = employer.settings.max_employees_per_shift;
+});
+
+shiftSchema.post('findOneAndUpdate', async (shift) => {
+  if (!shift) return;
+
+  if (shift.employees.length < shift.min_employees) {
+    // Notify all available employees of the opening
+  }
 });
 
 module.exports = mongoose.models.Shift || mongoose.model('Shift', shiftSchema);

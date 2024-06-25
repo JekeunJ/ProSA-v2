@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./server.js",
-    "dev": "doppler run -- nodemon ./server.js"
+    "start": "infisical run -- node ./server.js",
+    "dev": "infisical run -- nodemon ./server.js"
   },
   "dependencies": {
     "axios": "^1.6.7",

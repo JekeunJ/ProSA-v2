@@ -26,6 +26,7 @@
     "eslint-plugin-workspaces": "^0.7.0"
   },
   "dependencies": {
-    "core-js": "^3.24.0"
+    "core-js": "^3.24.0",
+    "figures": "^6.1.0"
   }
 }

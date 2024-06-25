@@ -1,7 +1,8 @@
+/* eslint-disable no-await-in-loop */
 const { nanoid } = require('nanoid');
 const dayjs = require('../dayjs');
 const mongoose = require('../mongoose');
-const { isValidBitmap, bitmapArrayToString } = require('../services/availability');
+const { nineToFive, isValidBitmap, bitmapArrayToString } = require('../services/availability');
 const Employer = require('./Employer');
 const User = require('./User');
 
@@ -32,18 +33,33 @@ const employeeSchema = new mongoose.Schema({
     immutable: true,
     required: true,
     ref: 'Employer',
-    validate: (v) => Employer.exists({ _id: v }),
+    validate(v) { return this.is_employer || Employer.exists({ _id: v }); },
   },
   is_employer: {
     type: Boolean,
     immutable: true,
     default: false,
   },
+  /* As per request, ratings & friends */
+  rating: {
+    type: Number,
+    min: 0,
+    max: 5,
+    set: (v) => Math.round(v),
+    default: null,
+  },
+  // TODO: This should be its own model in the future
+  friends: [{
+    type: String,
+    immutable: true,
+    ref: 'Employee',
+    validate: (v) => mongoose.models.Employee.exists({ _id: v }), // Self reference -- use mongoose.models
+  }],
   /* Availability to pick up shifts */
   availability: {
     weekly: {
       type: String,
-      required: true,
+      default: nineToFive, // Default to 9-5 availability
       validate: (v) => isValidBitmap(v),
     },
     scheduled: [{
@@ -61,39 +77,6 @@ const employeeSchema = new mongoose.Schema({
       },
     }],
   },
-  /* Business info to collect -- in the future this should be its own model, but this will be simpler for MVP */
-  business: {
-    name: {
-      type: String,
-      required: true,
-    },
-    address: {
-      city: {
-        type: String,
-        default: null,
-      },
-      country: {
-        type: String,
-        default: null,
-      },
-      line1: {
-        type: String,
-        default: null,
-      },
-      line2: {
-        type: String,
-        default: null,
-      },
-      postal_code: {
-        type: String,
-        default: null,
-      },
-      state: {
-        type: String,
-        default: null,
-      },
-    },
-  },
 });
 
 employeeSchema.index({ user: 1 });
@@ -104,6 +87,23 @@ employeeSchema.virtual('shifts', {
   localField: '_id',
   foreignField: 'employees',
   justOne: true,
+});
+
+employeeSchema.post('deleteOne', async function () {
+  const Shift = require('./Shift');
+
+  // Remove employee from all shifts to which they are assigned
+  const shifts = await Shift.find({ employees: this.id });
+  await Promise.all(shifts.map(async (shift) => {
+    await shift.updateOne({ $pull: { employees: this.id } }, { runValidators: true, new: true });
+  }));
+
+  // Remove employee from friends
+  await mongoose.models.Employee.updateMany(
+    { friends: this.id },
+    { $pull: { friends: this.id } },
+    { runValidators: true, new: true },
+  );
 });
 
 module.exports = mongoose.models.Employee || mongoose.model('Employee', employeeSchema);

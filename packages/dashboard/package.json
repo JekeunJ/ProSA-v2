@@ -3,12 +3,11 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "infisical run -- next dev",
     "build": "next build",
     "start": "next start"
   },
   "dependencies": {
-    "@dopplerhq/universal-import-react": "^0.0.9",
     "@fortawesome/fontawesome-svg-core": "^6.1.2",
     "@fortawesome/free-brands-svg-icons": "^6.1.2",
     "@fortawesome/pro-regular-svg-icons": "^6.5.2",

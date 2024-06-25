@@ -12,6 +12,7 @@ module.exports = async function scheduleCycles(message) {
     const employers = await Employer.find({
       $and: [
         {
+          'settings.shifts_per_cycle': { $ne: null },
           'settings.cycle_length': { $ne: null },
           'settings.cycles_scheduled': { $ne: null },
           'settings.last_cycle_end': { $ne: null },

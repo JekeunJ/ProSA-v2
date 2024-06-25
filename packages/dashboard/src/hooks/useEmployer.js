@@ -1,6 +1,6 @@
 import useSWR from 'swr';
 
-export default function usePractice() {
+export default function useEmployer() {
   const { data, error, mutate } = useSWR(
     '/api/auth/employer',
     { shouldRetryOnError: false },

@@ -6,7 +6,7 @@ module.exports.retrieveUser = async function retrieveUser(req, res, next) {
   try {
     const user = await User.findOne({
       _id: res.locals.user.id,
-    }).populate('client practitioner practices');
+    }).populate('employees employers');
 
     if (!user) return res.sendStatus(status.NOT_FOUND);
 

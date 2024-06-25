@@ -11,7 +11,6 @@ router.use(helmet());
 router.use(cors());
 router.use(cookieParser());
 
-router.use('/', require('./practice'));
-router.use('/', require('./practitioner'));
+// No routes yet -- I'll create these as needed
 
 module.exports = router;

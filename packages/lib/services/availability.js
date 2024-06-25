@@ -1,5 +1,13 @@
 const dayjs = require('../dayjs');
 
+// Default availability for new employees
+module.exports.nineToFive = (() => {
+  const weekend = '0'.repeat(24 * 12); // Weekends free
+  const weekday = '0'.repeat(9 * 12) + '1'.repeat(8 * 12) + '0'.repeat(7 * 12);
+
+  return weekend + weekday.repeat(5) + weekend;
+})();
+
 // Converts a bitmap string to an array of 1s and 0s
 module.exports.bitmapStringToArray = function bitmapStringToArray(bitmapString) {
   return bitmapString.split('').map((bit) => parseInt(bit, 10));

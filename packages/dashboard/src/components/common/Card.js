@@ -9,7 +9,7 @@ export default function Card({
     <div
       className={clsx(
         className,
-        'relative bg-white dark:bg-gray-800 border shadow-sm',
+        'relative bg-white border shadow-sm',
         hoverable && 'transition hover:shadow',
         !className?.includes('rounded') && 'rounded-md',
         {
@@ -27,7 +27,7 @@ export default function Card({
 
 Card.Header = function ({ children, className, ...props }) {
   return (
-    <div className={clsx(className, 'py-4 px-5 bg-white dark:bg-gray-800 rounded-t-md')} {...props}>
+    <div className={clsx(className, 'py-4 px-5 bg-white rounded-t-md')} {...props}>
       {children}
     </div>
   );
@@ -35,7 +35,7 @@ Card.Header = function ({ children, className, ...props }) {
 
 Card.Body = function ({ children, className, ...props }) {
   return (
-    <div className={clsx(className, 'p-5 bg-white dark:bg-gray-800 first:rounded-t-md last:rounded-b-md')} {...props}>
+    <div className={clsx(className, 'p-5 bg-white first:rounded-t-md last:rounded-b-md')} {...props}>
       {children}
     </div>
   );
@@ -43,7 +43,7 @@ Card.Body = function ({ children, className, ...props }) {
 
 Card.Footer = function ({ children, className, ...props }) {
   return (
-    <div className={clsx(className, 'py-4 px-5 bg-white dark:bg-gray-800 rounded-b-md')} {...props}>
+    <div className={clsx(className, 'py-4 px-5 bg-white rounded-b-md')} {...props}>
       {children}
     </div>
   );

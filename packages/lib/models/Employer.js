@@ -6,6 +6,11 @@ const mongoose = require('../mongoose');
 const User = require('./User');
 
 const shiftSettingSchema = new mongoose.Schema({
+  name: { // Optional shift name, e.g. Morning/Noon/Night
+    type: String,
+    default: null,
+    trim: true,
+  },
   start_time: {
     type: Number, // Not a date -- stored as millis from beginning of the week
     required: true,
@@ -59,9 +64,8 @@ const employerSchema = new mongoose.Schema({
   employee: {
     type: String,
     immutable: true,
-    required: true,
+    default: null, // This should always be populated, but the employee is created after validation
     ref: 'Employee',
-    validate(v) { return User.exists({ _id: v, employer: this._id }); },
   },
   /* Business info to collect -- in the future this should be its own model, but this will be simpler for MVP */
   business: {
@@ -101,47 +105,47 @@ const employerSchema = new mongoose.Schema({
         default: null,
       },
     },
-    settings: {
-      shifts_per_cycle: [shiftSettingSchema],
-      cycle_length: { // How many weeks is one cycle? Automatically filled based on shifts
-        type: Number,
-        default: 1,
-        min: 1,
-      },
-      cycles_scheduled: { // How many cycles should be scheduled at a time?
-        type: Number,
-        default() {
-          return Math.max(
-            Math.ceil((4 / this.settings.cycle_length)),
-            2,
-          ); // Whichever is bigger between 2 cycles and 1 month
-        },
-        min: 1,
-      },
-      last_cycle_end: { // The last scheduled cycle's end date -- used for scheduling
-        type: Date,
-        hidden: true,
-        set: (v) => dayjs(v).startOf('week').startOf('day'),
-        get: (v) => v?.getTime(),
-        default: null,
-      },
-      /* These two are defaults for all shifts */
-      min_employees_per_shift: {
-        type: Number,
-        required: true,
-        default: 1,
-        min: 0,
-      },
-      max_employees_per_shift: {
-        type: Number,
-        default: null,
-      },
-      /* Do we automatically not schedule shifts on holidays? */
-      holidays_off: [{
-        type: String,
-        enum: holidays.map((holiday) => holiday.id),
-      }],
+  },
+  settings: {
+    shifts_per_cycle: [shiftSettingSchema],
+    cycle_length: { // How many weeks is one cycle? Automatically filled based on shifts
+      type: Number,
+      default: 1,
+      min: 1,
     },
+    cycles_scheduled: { // How many cycles should be scheduled at a time?
+      type: Number,
+      default() {
+        return Math.max(
+          Math.ceil((4 / this.settings.cycle_length)),
+          2,
+        ); // Whichever is bigger between 2 cycles and 1 month
+      },
+      min: 1,
+    },
+    last_cycle_end: { // The last scheduled cycle's end date -- used for scheduling
+      type: Date,
+      hidden: true,
+      set: (v) => dayjs(v).startOf('week').startOf('day'),
+      get: (v) => v?.getTime(),
+      default: null,
+    },
+    /* These two are defaults for all shifts */
+    min_employees_per_shift: {
+      type: Number,
+      required: true,
+      default: 1,
+      min: 0,
+    },
+    max_employees_per_shift: {
+      type: Number,
+      default: null,
+    },
+    /* Do we automatically not schedule shifts on holidays? */
+    holidays_off: [{
+      type: String,
+      enum: holidays.map((holiday) => holiday.id),
+    }],
   },
 });
 
@@ -182,6 +186,20 @@ employerSchema.pre('validate', async function () {
       type: 'public',
     }).map((holiday) => holiday.id);
   }
+});
+
+employerSchema.pre('save', async function () {
+  const Employee = require('./Employee');
+
+  // Create the employee
+  const employee = await Employee.create({
+    employer: this.id,
+    name: this.name,
+    user: this.user,
+    is_employer: true,
+  });
+
+  this.employee = employee.id;
 });
 
 employerSchema.post('deleteOne', async function () {

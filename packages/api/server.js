@@ -37,7 +37,7 @@ async function start() {
   app.use('/auth', require('./src/routes/auth'));
   app.use('/healthcheck', require('./src/routes/health'));
   app.use('/dashboard', require('./src/routes/dashboard'));
-  app.use('/', require('./src/routes/index'));
+  app.use('/v1', require('./src/routes/v1'));
 
   app.use(errorHandler);
 
