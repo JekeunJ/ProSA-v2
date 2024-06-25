@@ -18,8 +18,8 @@ export default function Demo() {
   // This one lists 10 shifts to which the currently logged in employee is assigned
   const { data: shifts } = useAPI(user?.employee && '/v1/shifts', { employees: user?.employee?.id, limit: 10 });
 
-  // And this one just reads one employee
-  const employee = useAPI(employees?.length && `/v1/employees/${employees[0].id}`);
+  // And this one just reads one employee, expanding on their individual shifts and friends
+  const employee = useAPI(employees?.length && `/v1/employees/${employees[0].id}`, { expand: 'friends shifts' });
 
   // Now to display all the raw fetched JSON data
   return (

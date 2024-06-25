@@ -48,13 +48,6 @@ const employeeSchema = new mongoose.Schema({
     set: (v) => Math.round(v),
     default: null,
   },
-  // TODO: This should be its own model in the future
-  friends: [{
-    type: String,
-    immutable: true,
-    ref: 'Employee',
-    validate: (v) => mongoose.models.Employee.exists({ _id: v }), // Self reference -- use mongoose.models
-  }],
   /* Availability to pick up shifts */
   availability: {
     weekly: {
@@ -77,6 +70,9 @@ const employeeSchema = new mongoose.Schema({
       },
     }],
   },
+}, {
+  toJSON: { getters: true, virtuals: true },
+  toObject: { getters: true, virtuals: true },
 });
 
 employeeSchema.index({ user: 1 });
@@ -89,8 +85,28 @@ employeeSchema.virtual('shifts', {
   justOne: true,
 });
 
+employeeSchema.virtual('friends', {
+  ref: 'Friendship',
+  localField: '_id',
+  foreignField: 'employees',
+  justOne: false,
+  options: {
+    select: 'employees',
+    populate: {
+      path: 'employees',
+      select: '-friends',
+    },
+  },
+  get(friendships) {
+    return friendships
+      ?.map((friendship) => friendship.employees
+        .find((employee) => employee._id !== this._id));
+  },
+});
+
 employeeSchema.post('deleteOne', async function () {
   const Shift = require('./Shift');
+  const Friendship = require('./Friendship');
 
   // Remove employee from all shifts to which they are assigned
   const shifts = await Shift.find({ employees: this.id });
@@ -99,11 +115,7 @@ employeeSchema.post('deleteOne', async function () {
   }));
 
   // Remove employee from friends
-  await mongoose.models.Employee.updateMany(
-    { friends: this.id },
-    { $pull: { friends: this.id } },
-    { runValidators: true, new: true },
-  );
+  await Friendship.deleteMany({ employees: this.id });
 });
 
 module.exports = mongoose.models.Employee || mongoose.model('Employee', employeeSchema);

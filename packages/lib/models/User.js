@@ -27,6 +27,9 @@ const userSchema = new mongoose.Schema({
     trim: true,
     validate: (v) => !v || /^\+\d{10,15}$/.test(v),
   },
+}, {
+  toJSON: { getters: true, virtuals: true },
+  toObject: { getters: true, virtuals: true },
 });
 
 userSchema.index({ email: 1 }, { unique: true });

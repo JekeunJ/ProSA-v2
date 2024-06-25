@@ -4,6 +4,7 @@
 const dayjs = require('lib/dayjs');
 const Employee = require('lib/models/Employee');
 const Employer = require('lib/models/Employer');
+const Friendship = require('lib/models/Friendship');
 const Shift = require('lib/models/Shift');
 const User = require('lib/models/User');
 const mongoose = require('lib/mongoose');
@@ -78,16 +79,32 @@ async function populateSampleData() {
       employer: employer.id,
       user: user.id,
       rating: Math.round(Math.random() * 5),
-      friends: sampleSize(
-        employees.map((employee) => employee.id),
-        Math.round(Math.random() * employees.length),
-      ),
     });
 
     employees.push(employee);
   }
 
   console.log('Created employees');
+
+  /* Create a bunch of friendships -- 5 again */
+  for (let i = 0; i < 5; i++) {
+    const friends = sampleSize(
+      employees.map((employee) => employee.id),
+      2,
+    );
+
+    if (await Friendship.exists({ employees: { $all: friends } })) {
+      i--;
+      continue;
+    }
+
+    await Friendship.create({
+      employer: employer.id,
+      employees: friends,
+    });
+  }
+
+  console.log('Created friendships');
 
   /* Schedule the current and next cycles */
   const currentCycleStart = dayjs().startOf('week').startOf('day');

@@ -3,7 +3,10 @@ const { InvalidRequestError } = require('../helpers/Error');
 module.exports = function mongooseExpand(schema) {
   const paths = Object.entries(schema.paths)
     .filter(([, { options, caster }]) => options.expandable || caster?.options?.expandable)
-    .map(([path]) => path);
+    .map(([path]) => path)
+    .concat(Object.entries(schema.virtuals) // Include any lookup virtuals
+      .filter(([, { options }]) => options.ref)
+      .map(([path]) => path));
 
   schema.pre(['find', 'findById', 'findOne'], function () {
     let { expand } = this.getQuery();

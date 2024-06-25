@@ -34,6 +34,8 @@ router.get('/employers', auth([Employer, Employee]), employer.listEmployers);
 router.post('/employees', auth([Employer]), employee.createEmployee);
 router.get('/employees/:id', auth([Employer, Employee]), employee.retrieveEmployee);
 router.patch('/employees/:id', auth([Employer, Employee]), employee.updateEmployee);
+router.post('/employees/friends', auth([Employer]), employee.setEmployeeFriend);
+router.delete('/employees/friends', auth([Employer]), employee.removeEmployeeFriend);
 router.delete('/employese/:id', auth([Employer, Employee]), employee.deleteEmployee);
 router.get('/employees', auth([Employer, Employee]), employee.listEmployees);
 

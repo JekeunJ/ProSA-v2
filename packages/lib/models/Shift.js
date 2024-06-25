@@ -60,6 +60,9 @@ const shiftSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+}, {
+  toJSON: { getters: true, virtuals: true },
+  toObject: { getters: true, virtuals: true },
 });
 
 shiftSchema.index({ user: 1 });

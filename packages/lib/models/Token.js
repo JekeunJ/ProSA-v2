@@ -20,6 +20,9 @@ const tokenSchema = new mongoose.Schema({
     ref: 'User',
     validate: (v) => User.exists({ _id: v }),
   },
+}, {
+  toJSON: { getters: true, virtuals: true },
+  toObject: { getters: true, virtuals: true },
 });
 
 tokenSchema.index({ created: 1 }, { expireAfterSeconds: 60 * 60 * 24 * 7 });

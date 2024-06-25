@@ -147,6 +147,9 @@ const employerSchema = new mongoose.Schema({
       enum: holidays.map((holiday) => holiday.id),
     }],
   },
+}, {
+  toJSON: { getters: true, virtuals: true },
+  toObject: { getters: true, virtuals: true },
 });
 
 employerSchema.index({ user: 1 });
