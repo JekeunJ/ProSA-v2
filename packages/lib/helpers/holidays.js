@@ -6,7 +6,8 @@ const _addID = (holiday) => ({ ...holiday, id: slugify(holiday.name, { lower: tr
 module.exports.holidays = (new DateHolidays()).getHolidays().map(_addID);
 
 module.exports.isHoliday = function isHoliday(date) {
-  return (new DateHolidays()).isHoliday(date).map(_addID);
+  const isHoliday = (new DateHolidays()).isHoliday(date);
+  return isHoliday ? isHoliday.map(_addID) : [];
 };
 
 module.exports.getHolidays = function getHolidays(...params) {

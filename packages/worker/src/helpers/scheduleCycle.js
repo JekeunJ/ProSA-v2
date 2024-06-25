@@ -5,12 +5,6 @@ const { intersection } = require('lodash/intersection');
 const { union } = require('lodash/union');
 const { xor } = require('lodash/xor');
 
-// Converts weekly availability to a bitmap for a specific week.
-function getWeeklyAvailability(employee, weekOf) {
-  const override = employee.availability.scheduled.find((schedule) => dayjs(schedule.week_of).isSame(dayjs(weekOf), 'week'));
-  return override?.availability || employee.availability.weekly;
-}
-
 // Gets the intervals for a shift.
 function getIntervalsForShift({ start_time: startTime, end_time: endTime }) {
   const startInterval = Math.floor(dayjs(startTime).diff(dayjs().startOf('week'), 'minute') / 5);
@@ -241,18 +235,15 @@ function splitShiftIntoSegments(shift, employees, minShiftDuration) {
 
   // Step 6: Create new shifts from the final segments
   return timeSegments.map((segment) => ({
+    ...shift,
     start_time: segment.start.toDate(),
     end_time: segment.end.toDate(),
-    min_employees: shift.min_employees,
-    max_employees: shift.max_employees,
     employees: segment.employees,
     split_depth: (shift.split_depth || 0) + 1,
   }));
 }
 
 module.exports.scheduleShifts = function scheduleShifts(shifts, employees, {
-  cycleStartTime,
-  cycleLength,
   minShiftDuration,
   enableShiftSplitting = true,
   addExcess = true,
@@ -323,11 +314,6 @@ module.exports.scheduleShifts = function scheduleShifts(shifts, employees, {
 
   // Initialize employees and assign initial availability
   employees = employees.map((employee) => {
-    const availability = Array.from({ length: cycleLength }, (_, i) => {
-      const weekStart = dayjs(cycleStartTime).startOf('week').add(i, 'week');
-      return getWeeklyAvailability(employee, weekStart);
-    }).join('');
-
     const assigned = shifts
       .filter((shift) => shift.employees.includes(employee.id))
       .reduce((acc, shift) => {
@@ -336,14 +322,13 @@ module.exports.scheduleShifts = function scheduleShifts(shifts, employees, {
           acc[interval] = 1;
         });
         return acc;
-      }, Array(availability.length).fill(0))
+      }, Array(employee.availability.length).fill(0))
       .join('');
 
     return {
       ...employee,
       hours: 0,
       assigned,
-      availability,
     };
   });
 

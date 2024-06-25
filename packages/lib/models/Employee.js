@@ -93,11 +93,6 @@ const employeeSchema = new mongoose.Schema({
         default: null,
       },
     },
-    settings: {
-      shift_duration: {
-        /* Bruh..... */
-      },
-    },
   },
 });
 

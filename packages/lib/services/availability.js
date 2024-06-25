@@ -16,8 +16,8 @@ module.exports.isValidBitmap = function isValidBitmap(bitmapString, expectedLeng
 };
 
 // Converts a time range to bitmap intervals based on a 5-minute resolution
-module.exports.timeRangeToIntervals = function timeRangeToIntervals(startTime, endTime) {
-  const startOfWeek = dayjs().startOf('week');
+module.exports.timeRangeToIntervals = function timeRangeToIntervals(time, startTime, endTime) {
+  const startOfWeek = dayjs(startTime).startOf('week');
   const startInterval = Math.floor(startTime.diff(startOfWeek, 'minute') / 5);
   const endInterval = Math.ceil(endTime.diff(startOfWeek, 'minute') / 5);
   const intervals = [];

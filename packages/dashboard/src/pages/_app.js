@@ -5,30 +5,30 @@ import './global.css';
 import DashboardContext from '../context/DashboardContext';
 
 export default function App({ Component, pageProps }) {
-  // Save current practice for admin users who may have access to multiple practices
-  const [practice, setPractice] = React.useState(null);
+  // Save current employer for users who may be employed by multiple
+  const [employer, setEmployer] = React.useState(null);
 
   const dashboardContext = React.useMemo(() => ({
-    practice,
-    setPractice,
-  }), [practice]);
+    employer,
+    setEmployer,
+  }), [employer]);
 
-  // Load practice from local storage
+  // Load employer from local storage
   React.useEffect(() => {
-    setPractice(localStorage.getItem('practice'));
+    setEmployer(localStorage.getItem('employer'));
   }, []);
 
-  // Save practice in local storage when changed
+  // Save employer in local storage when changed
   React.useEffect(() => {
-    if (practice) localStorage.setItem('practice', practice);
-  }, [practice]);
+    if (employer) localStorage.setItem('employer', employer);
+  }, [employer]);
 
   return (
     <DashboardContext.Provider value={dashboardContext}>
       <SWRConfig value={{
         fetcher: (url, query) => {
           return axios.get(url, {
-            headers: { 'Recoverise-Practice': practice },
+            headers: { 'ProSa-Employer': employer },
             params: query && JSON.parse(query),
           }).then((res) => res.data);
         },
