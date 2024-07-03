@@ -21,6 +21,7 @@ module.exports.createShift = async function createShift(req, res, next) {
 module.exports.retrieveShift = async function retrieveShift(req, res, next) {
   try {
     const shift = await Shift.findOne({
+      ...req.query,
       _id: req.params.id,
       ...(res.locals.employer && { employer: res.locals.employer }),
       ...(res.locals.employee && { employer: res.locals.employee.employer }),
@@ -69,16 +70,14 @@ module.exports.listShifts = async function listShifts(req, res, next) {
 // Delete a shift
 module.exports.deleteShift = async function deleteShift(req, res, next) {
   try {
-    const shift = await Shift.findOne({
+    const shift = await Shift.findOneAndUpdate({
       _id: req.params.id,
       ...(res.locals.employer && { employer: res.locals.employer }),
-    });
+    }, { canceled: true }, { runValidators: true, new: true });
 
     if (!shift) return res.sendStatus(status.NOT_FOUND);
 
-    await shift.deleteOne();
-
-    res.sendStatus(status.ACCEPTED);
+    res.send(shift.toJSON());
   } catch (err) {
     next(err);
   }

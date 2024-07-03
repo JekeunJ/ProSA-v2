@@ -104,6 +104,52 @@ employeeSchema.virtual('friends', {
   },
 });
 
+employeeSchema.virtual('hours', {
+  ref: 'Shift',
+  localField: '_id',
+  foreignField: 'employees',
+  justOne: false,
+  options: {
+    select: 'duration start_time end_time status',
+    populate: {
+      path: 'employees',
+      select: '-friends',
+    },
+  },
+  get(shifts) {
+    return shifts
+      ?.flatMap((shift) => {
+        if (shift.status === 'canceled') return [];
+        if (dayjs(shift.start_time).isSame(dayjs(shift.end_time), 'week')) return shift;
+
+        const segments = [];
+        let currentStart = dayjs(shift.start_time);
+        const end = dayjs(shift.end_time);
+
+        while (currentStart.isBefore(end)) {
+          const endOfWeek = currentStart.add(1, 'second').endOf('week');
+          if (end.isBefore(endOfWeek)) {
+            segments.push({ start_time: currentStart.toDate(), end_time: end.toDate(), duration: end - currentStart });
+            break;
+          }
+
+          segments.push({ start_time: currentStart.toDate(), end_time: endOfWeek.toDate(), duration: endOfWeek - currentStart });
+          currentStart = endOfWeek;
+        }
+
+        return segments;
+      })
+      ?.reduce((hours, shift) => {
+        const startWeek = dayjs(shift.start_time).startOf('week').unix();
+
+        return {
+          ...hours,
+          [startWeek]: (hours[startWeek] || 0) + dayjs.duration(shift.duration).asHours(),
+        };
+      }, {});
+  },
+});
+
 employeeSchema.post('deleteOne', async function () {
   const Shift = require('./Shift');
   const Friendship = require('./Friendship');

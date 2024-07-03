@@ -12,6 +12,12 @@ export const updateShift = function updateShift(id, data) {
     .then((response) => response.data);
 };
 
+// Add an employee to a shift
+export const addEmployeeToShift = function addEmployeeToShift(shiftId, employeeId) {
+  return axios.patch(`/api/v1/shifts/${shiftId}`, { employees: { $addToSet: employeeId } })
+    .then((response) => response.data);
+};
+
 // Add an employee to a shift. Uses the same method as updateShift under the hood
 export const assignShift = function updateShift(id, employeeId) {
   return axios.patch(`/api/v1/shifts/${id}`, { $addToSet: { employees: employeeId } })

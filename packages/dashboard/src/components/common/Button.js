@@ -1,4 +1,4 @@
-import { faSpinner } from '@fortawesome/pro-regular-svg-icons';
+import { faSpinner } from '@fortawesome/pro-regular-svg-icons/faSpinner';
 import clsx from 'clsx';
 import Color from 'color';
 import PropTypes from 'prop-types';

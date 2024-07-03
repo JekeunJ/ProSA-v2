@@ -49,13 +49,13 @@ const shiftSchema = new mongoose.Schema({
   },
   /* TODO: Only allow employee additions if below employer.settings.max_per_shift */
   employees: [{
+    expandable: true,
     type: String,
     immutable: true,
     ref: 'Employee',
     validate: (v) => Employee.exists({ _id: v }),
   }],
   /* If the shift is canceled, no one can sign up for it */
-  /* TODO: This has a number of prerequisites (shift is upcoming) and effects (remove all employees) so only cancelable through DELETE route */
   canceled: {
     type: Boolean,
     default: false,
