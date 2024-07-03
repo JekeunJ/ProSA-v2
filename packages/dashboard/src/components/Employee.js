@@ -1,7 +1,6 @@
 /* eslint-disable react/prop-types */
 import { useDraggable } from '@dnd-kit/core';
 import { faSpinner } from '@fortawesome/pro-regular-svg-icons/faSpinner';
-import { faUserMinus } from '@fortawesome/pro-regular-svg-icons/faUserMinus';
 import { faUserPlus } from '@fortawesome/pro-regular-svg-icons/faUserPlus';
 import { faUserXmark } from '@fortawesome/pro-regular-svg-icons/faUserXmark';
 import { Transition, Popover } from '@headlessui/react';
